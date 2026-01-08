@@ -299,6 +299,7 @@ export const GridScan = ({
   style
 }) => {
   const containerRef = useRef(null);
+  const canvasWrapperRef = useRef(null);
   const videoRef = useRef(null);
 
   const rendererRef = useRef(null);
@@ -310,6 +311,7 @@ export const GridScan = ({
 
   const [modelsReady, setModelsReady] = useState(false);
   const [uiFaceActive, setUiFaceActive] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
 
   const lookTarget = useRef(new THREE.Vector2(0, 0));
   const tiltTarget = useRef(0);
@@ -354,6 +356,17 @@ export const GridScan = ({
 
   const yBoost = THREE.MathUtils.lerp(1.2, 1.6, s);
 
+  // Check orientation on mount and resize
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    return () => window.removeEventListener('resize', checkOrientation);
+  }, []);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -365,8 +378,20 @@ export const GridScan = ({
         leaveTimer = null;
       }
       const rect = el.getBoundingClientRect();
-      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+      
+      // Transform mouse coordinates for portrait mode
+      let nx, ny;
+      if (isPortrait) {
+        // Rotate coordinates 90 degrees counterclockwise
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+        nx = y;  // Swap and rotate
+        ny = -x;
+      } else {
+        nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+      }
+      
       lookTarget.current.set(nx, ny);
     };
     const onClick = async () => {
@@ -411,25 +436,36 @@ export const GridScan = ({
       if (scanOnClick) el.removeEventListener('click', onClick);
       if (leaveTimer) clearTimeout(leaveTimer);
     };
-  }, [uiFaceActive, snapBackDelay, scanOnClick, enableGyro]);
+  }, [uiFaceActive, snapBackDelay, scanOnClick, enableGyro, isPortrait]);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    const wrapper = canvasWrapperRef.current;
+    if (!container || !wrapper) return;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     rendererRef.current = renderer;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.NoToneMapping;
     renderer.autoClear = false;
     renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
+    
+    // Calculate initial size based on orientation
+    const getCanvasSize = () => {
+      if (isPortrait) {
+        return { width: container.clientHeight, height: container.clientWidth };
+      }
+      return { width: container.clientWidth, height: container.clientHeight };
+    };
+    
+    const initialSize = getCanvasSize();
+    renderer.setSize(initialSize.width, initialSize.height);
+    wrapper.appendChild(renderer.domElement);
 
     const uniforms = {
       iResolution: {
-        value: new THREE.Vector3(container.clientWidth, container.clientHeight, renderer.getPixelRatio())
+        value: new THREE.Vector3(initialSize.width, initialSize.height, renderer.getPixelRatio())
       },
       iTime: { value: 0 },
       uSkew: { value: new THREE.Vector2(0, 0) },
@@ -496,10 +532,15 @@ export const GridScan = ({
       composer.addPass(effectPass);
     }
 
+    const updateSize = () => {
+      const size = getCanvasSize();
+      renderer.setSize(size.width, size.height);
+      material.uniforms.iResolution.value.set(size.width, size.height, renderer.getPixelRatio());
+      if (composerRef.current) composerRef.current.setSize(size.width, size.height);
+    };
+
     const onResize = () => {
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      material.uniforms.iResolution.value.set(container.clientWidth, container.clientHeight, renderer.getPixelRatio());
-      if (composerRef.current) composerRef.current.setSize(container.clientWidth, container.clientHeight);
+      updateSize();
     };
     window.addEventListener('resize', onResize);
 
@@ -570,7 +611,9 @@ export const GridScan = ({
         composerRef.current = null;
       }
       renderer.dispose();
-      container.removeChild(renderer.domElement);
+      if (wrapper.contains(renderer.domElement)) {
+        wrapper.removeChild(renderer.domElement);
+      }
     };
   }, [
     sensitivity,
@@ -598,7 +641,8 @@ export const GridScan = ({
     skewScale,
     yBoost,
     tiltScale,
-    yawScale
+    yawScale,
+    isPortrait
   ]);
 
   useEffect(() => {
@@ -656,8 +700,17 @@ export const GridScan = ({
       if (uiFaceActive) return;
       const gamma = e.gamma ?? 0;
       const beta = e.beta ?? 0;
-      const nx = THREE.MathUtils.clamp(gamma / 45, -1, 1);
-      const ny = THREE.MathUtils.clamp(-beta / 30, -1, 1);
+      
+      let nx, ny;
+      if (isPortrait) {
+        // Adjust gyro for portrait orientation
+        nx = THREE.MathUtils.clamp(-beta / 30, -1, 1);
+        ny = THREE.MathUtils.clamp(gamma / 45, -1, 1);
+      } else {
+        nx = THREE.MathUtils.clamp(gamma / 45, -1, 1);
+        ny = THREE.MathUtils.clamp(-beta / 30, -1, 1);
+      }
+      
       lookTarget.current.set(nx, ny);
       tiltTarget.current = THREE.MathUtils.degToRad(gamma) * 0.4;
     };
@@ -665,7 +718,7 @@ export const GridScan = ({
     return () => {
       window.removeEventListener('deviceorientation', handler);
     };
-  }, [enableGyro, uiFaceActive]);
+  }, [enableGyro, uiFaceActive, isPortrait]);
 
   useEffect(() => {
     let canceled = false;
@@ -730,7 +783,14 @@ export const GridScan = ({
               const nxm = median(bufX.current);
               const nym = median(bufY.current);
 
-              const look = new THREE.Vector2(Math.tanh(nxm), Math.tanh(nym));
+              let look = new THREE.Vector2(Math.tanh(nxm), Math.tanh(nym));
+              
+              // Adjust face tracking for portrait orientation
+              if (isPortrait) {
+                const temp = look.x;
+                look.x = look.y;
+                look.y = -temp;
+              }
 
               const faceSize = Math.min(1, Math.hypot(box.width / vw, box.height / vh));
               const depthScale = 1 + depthResponse * (faceSize - 0.25);
@@ -787,13 +847,28 @@ export const GridScan = ({
         video.srcObject = null;
       }
     };
-  }, [enableWebcam, modelsReady, depthResponse]);
+  }, [enableWebcam, modelsReady, depthResponse, isPortrait]);
 
   return (
     <div
       ref={containerRef}
       className={`relative w-full h-full overflow-hidden ${className ?? ''}`}
       style={style}>
+      <div
+        ref={canvasWrapperRef}
+        style={isPortrait ? {
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%) rotate(90deg)',
+          transformOrigin: 'center center',
+          width: '100vh',
+          height: '100vw'
+        } : {
+          width: '100%',
+          height: '100%'
+        }}
+      />
       {showPreview && (
         <div
           className="absolute right-3 bottom-3 w-[220px] h-[132px] rounded-lg overflow-hidden border border-white/25 shadow-[0_4px_16px_rgba(0,0,0,0.4)] bg-black text-white text-[12px] leading-[1.2] font-sans pointer-events-none">
