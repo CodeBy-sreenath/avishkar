@@ -26,15 +26,29 @@ const menuItems = [
 
 const socialItems = [
   { label: 'Instagram', link: 'https://instagram.com' },
-  { label: 'Website', link: 'https://musaliarcollege.com/' },
+  { label: 'Website', link: 'https://musaliarcollege.com' },
 ];
 
 export default function Home() {
   const containerRef = useRef(null);
   const imagesRef = useRef([]);
+  const starsRef = useRef([]);
 
   useGSAP(() => {
     const images = imagesRef.current;
+    starsRef.current.forEach((star, i) => {
+      const speed = (i + 1) * 100; // Varying speeds
+      gsap.to(star, {
+        y: -speed,
+        ease: "none",
+        scrollTrigger: {
+          trigger: star,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        }
+      });
+    });
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -104,47 +118,101 @@ export default function Home() {
           socialItems={socialItems}
           displaySocials={true}
           displayItemNumbering={true}
-          menuButtonColor="#fff"
+          menuButtonColor="#FFFFE0"
           openMenuButtonColor="#000000"
           changeMenuColorOnOpen={true}
-          colors={['#FFFFE0', '#FFF800']}
+          colors={['#FFFFE0', '#FED700']}
           logoUrl="/images/star.svg"
-          accentColor="#FFF800"
+          accentColor="#FED700"
           onMenuOpen={() => console.log('Menu opened')}
           onMenuClose={() => console.log('Menu closed')}
         />
       </div>
       <div className="relative h-screen flex justify-center items-center overflow-hidden">
-        <Image src='/images/star.svg' alt='star1' width={60} height={60} className='absolute top-40 right-10' />
-        <Image src='/images/star.svg' alt='star2' width={100} height={100} className='absolute top-3/5 -right-10' />
-        <Image src='/images/star.svg' alt='star3' width={180} height={180} className='absolute top-2/6 -left-32 -translate-y-1/2 rotate-45' />
-        <Image src='/images/star.svg' alt='star4' width={50} height={50} className='absolute bottom-32 right-20 rotate-90' />
-        <Image src='/images/star.svg' alt='star5' width={120} height={120} className='absolute bottom-40 left-10 -rotate-12' />
-        <div className="">
-        <Shuffle
-          className={`${pressStart2P.className} `}
-          text="Avishkar"
-          shuffleDirection="right"
-          duration={0.45}
-          animationMode="evenodd"
-          shuffleTimes={1}
-          ease="power3.out"
-          stagger={0.03}
-          threshold={0.1}
-          triggerOnce={true}
-          triggerOnHover={true}
-          respectReducedMotion={true}
-          loop
-          loopDelay={3}
+        {/* Star 1 */}
+        <Image
+          ref={el => (starsRef.current[0] = el)}
+          src="/images/star.svg"
+          alt="star1"
+          width={60}
+          height={60}
+          className="absolute top-40 right-10"
         />
-        <h3 className={`${pressStart2P.className} text-lg `}>2026</h3>
+
+        {/* Star 2 */}
+        <Image
+          ref={el => (starsRef.current[1] = el)}
+          src="/images/star.svg"
+          alt="star2"
+          width={90}
+          height={90}
+          className="absolute top-[60%] -right-10"
+        />
+
+        {/* Star 3 */}
+        <Image
+          ref={el => (starsRef.current[2] = el)}
+          src="/images/star.svg"
+          alt="star3"
+          width={180}
+          height={180}
+          className="absolute top-[33%] -left-32 rotate-45"
+        />
+
+        {/* Star 4 */}
+        <Image
+          ref={el => (starsRef.current[3] = el)}
+          src="/images/star.svg"
+          alt="star4"
+          width={50}
+          height={50}
+          className="absolute bottom-10 right-60 rotate-12"
+        />
+
+        {/* Star 5 */}
+        <Image
+          ref={el => (starsRef.current[4] = el)}
+          src="/images/star.svg"
+          alt="star5"
+          width={120}
+          height={120}
+          className="absolute bottom-40 left-10 -rotate-12"
+        />
+
+        {/* Star 6 */}
+        <Image
+          ref={el => (starsRef.current[5] = el)}
+          src="/images/star.svg"
+          alt="star6"
+          width={105}
+          height={105}
+          className="absolute top-[80%] left-[60%] -rotate-45"
+        />
+        <div className="">
+          <Shuffle
+            className={`${pressStart2P.className} `}
+            text="Avishkar"
+            shuffleDirection="right"
+            duration={0.45}
+            animationMode="evenodd"
+            shuffleTimes={1}
+            ease="power3.out"
+            stagger={0.03}
+            threshold={0.1}
+            triggerOnce={true}
+            triggerOnHover={true}
+            respectReducedMotion={true}
+            loop
+            loopDelay={3}
+          />
+          <h3 className={`${pressStart2P.className} text-lg `}>2026</h3>
         </div>
       </div>
 
       {/* Cinematic Image Sequence Section */}
       <div
         ref={containerRef}
-        className="relative h-screen w-full flex justify-center items-center overflow-hidden bg-transparent"
+        className="relative h-screen w-full flex justify-center items-center overflow-hidden bg-transparent -mt-[90vh] md:-mt-[70vh]"
       >
         <div className="relative w-full h-full flex justify-center items-center">
           {[1, 2, 3].map((num, i) => (
