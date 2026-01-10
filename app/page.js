@@ -9,11 +9,6 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import dynamic from "next/dynamic"
-const DecayCard = dynamic(
-  () => import("@/components/DecayCard"),
-  { ssr: false }
-)
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -29,13 +24,17 @@ const socialItems = [
   { label: 'Website', link: 'https://musaliarcollege.com' },
 ];
 
+const eventLabels = ["MUSALIAR COLLAGE", "FEB 5, 6, 7", "TECH FEST"];
+
 export default function Home() {
   const containerRef = useRef(null);
   const imagesRef = useRef([]);
   const starsRef = useRef([]);
+  const ribbonsRef = useRef([]);
 
   useGSAP(() => {
     const images = imagesRef.current;
+    const ribbons = ribbonsRef.current;
     starsRef.current.forEach((star, i) => {
       const speed = (i + 1) * 100; // Varying speeds
       gsap.to(star, {
@@ -62,6 +61,10 @@ export default function Home() {
     });
 
     images.forEach((img, index) => {
+      const ribbon = ribbons[index];
+      const isEven = index % 2 === 0;
+      const isVertical = index === 1;
+
       // Initial state: Off-screen bottom, full size
       gsap.set(img, {
         yPercent: 100,
@@ -69,6 +72,16 @@ export default function Home() {
         opacity: 1,
         filter: "blur(0px) brightness(1)"
       });
+      if (isVertical) {
+        gsap.set(ribbon, {
+          yPercent: 150
+        });
+      } else {
+        gsap.set(ribbon, {
+          xPercent: isEven ? 150 : -150
+        });
+      }
+
 
       // 1. Slide In to Center from bottom
       tl.to(img, {
@@ -76,6 +89,20 @@ export default function Home() {
         duration: 1,
         ease: "power2.out"
       }, index === 0 ? 0 : "-=0.5");
+
+      if (isVertical) {
+        tl.to(ribbon, {
+          yPercent: -150,
+          duration: 2.5,
+          ease: "none"
+        }, index === 0 ? 0 : "-=1.2");
+      } else {
+        tl.to(ribbon, {
+          xPercent: isEven ? -150 : 150,
+          duration: 2.5,
+          ease: "none"
+        }, index === 0 ? 0 : "-=1.2");
+      }
 
       // 2. Recede into Depth (shrink, move up slightly, fade and blur)
       if (index < images.length) {
@@ -111,7 +138,7 @@ export default function Home() {
           enableWebcam={false}
         />
       </div>
-      <div className='h-[100dvh] fixed inset-0 z-20 '>
+      <div className='h-[100svh] fixed inset-0 z-20 '>
         <StaggeredMenu
           position="right"
           items={menuItems}
@@ -128,7 +155,7 @@ export default function Home() {
           onMenuClose={() => console.log('Menu closed')}
         />
       </div>
-      <div className="relative h-screen flex justify-center items-center overflow-hidden">
+      <div className="relative h-[100svh] flex justify-center items-center overflow-hidden">
         {/* Star 1 */}
         <Image
           ref={el => (starsRef.current[0] = el)}
@@ -212,8 +239,25 @@ export default function Home() {
       {/* Cinematic Image Sequence Section */}
       <div
         ref={containerRef}
-        className="relative h-screen w-full flex justify-center items-center overflow-hidden bg-transparent -mt-[90vh] md:-mt-[70vh]"
+        className="relative h-[100svh] w-full flex justify-center items-center overflow-hidden bg-transparent -mt-[90vh] md:-mt-[70vh]"
       >
+        {/* Ribbon Layer */}
+        {eventLabels.map((label, i) => (
+          <div
+            key={`ribbon-${i}`}
+            ref={el => (ribbonsRef.current[i] = el)}
+            className={`
+              absolute
+              ${i === 1 ? 'h-[200vh] md:h-[250vh] w-10 right-0 bottom-auto bg-[#04F24E]' : 'w-[300vw] md:w[200vh] h-10 bottom-0 bg-[#FED700]'}
+              flex items-center justify-center
+              z-20 shadow-2xl
+            `}
+          >
+            <span className={`${pressStart2P.className} text-black text-xl md:text-4xl whitespace-nowrap ${i === 1 && 'rotate-90'}`}>
+              • {label} • {label} • {label} •
+            </span>
+          </div>
+        ))}
         <div className="relative w-full h-full flex justify-center items-center">
           {[1, 2, 3].map((num, i) => (
             <div
@@ -237,7 +281,7 @@ export default function Home() {
       </div>
 
       {/* Spacer for scroll depth */}
-      <div className="h-screen" />
+      <div className="h-[100svh]" />
     </section>
   );
 }
