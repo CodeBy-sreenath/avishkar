@@ -284,7 +284,7 @@ export default function Home() {
               glitchMode={true}
               fontSize='clamp(1.5rem, 3vw, 8rem)'
             >
-              Stay Tuned
+              Stay Tuned.
             </FuzzyText>
           </div>
         </div>
