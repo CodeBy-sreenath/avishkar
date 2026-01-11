@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import FuzzyText from '@/components/FuzzyText';
 
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -31,6 +32,7 @@ export default function Home() {
   const imagesRef = useRef([]);
   const starsRef = useRef([]);
   const ribbonsRef = useRef([]);
+  const fuzzyTextRef = useRef(null);
 
   useGSAP(() => {
     const images = imagesRef.current;
@@ -47,6 +49,12 @@ export default function Home() {
           scrub: true,
         }
       });
+    });
+
+    // Set FuzzyText initial state
+    gsap.set(fuzzyTextRef.current, {
+      opacity: 0,
+      scale: 0.8
     });
 
     const tl = gsap.timeline({
@@ -116,6 +124,15 @@ export default function Home() {
         }, ">-0.3");
       }
     });
+
+    // Animate FuzzyText after the third image slides in
+    tl.to(fuzzyTextRef.current, {
+      opacity: 1,
+      scale: 1,
+      duration: 1,
+      ease: "power2.out"
+    }, ">-0.5");
+
   }, { scope: containerRef });
 
   return (
@@ -277,6 +294,20 @@ export default function Home() {
               </div>
             </div>
           ))}
+          <div ref={fuzzyTextRef} style={{ zIndex: 30 }}>
+            <FuzzyText
+              className={`${pressStart2P.className}`}
+              baseIntensity={0.2}
+              hoverIntensity={0.5}
+              enableHover={false}
+              color='#FED700'
+              fps={45}
+              glitchMode={true}
+              fontSize='clamp(1.5rem, 3vw, 8rem)'
+            >
+              Stay Tuned
+            </FuzzyText>
+          </div>
         </div>
       </div>
 
