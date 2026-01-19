@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StaggeredMenu from "@/components/StaggeredMenu";
 import Preload from "@/components/Preload";
-import { ClerkProvider } from "@clerk/nextjs"; // ✅ ADDED
+import { ClerkProvider } from "@clerk/nextjs"; //  ADDED
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
