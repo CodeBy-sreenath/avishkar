@@ -43,6 +43,7 @@ export async function POST(req) {
       age,
       phone,
       college,
+      participantDepartment,
       participantType, // college | school
       semester,
       schoolClass,
@@ -59,6 +60,7 @@ export async function POST(req) {
       !age ||
       !phone ||
       !college ||
+      !participantDepartment||
       !participantType ||
       !paymentScreenshot
     ) {
@@ -141,6 +143,7 @@ export async function POST(req) {
       phone,
       college,
       participantType,
+      participantDepartment,
       semester: participantType === "college" ? semester : null,
       schoolClass: participantType === "school" ? schoolClass : null,
       teamMembers: event.type === "team" ? teamMembers : [],
@@ -161,6 +164,49 @@ export async function POST(req) {
     );
   } catch (error) {
     console.error("Registration Error:", error);
+    return Response.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+export async function GET(req) {
+  try {
+    await connectDB();
+
+    const userId = req.headers.get("x-user-id");
+
+    if (!userId) {
+      return Response.json(
+        { message: "Unauthorized: user not found" },
+        { status: 401 }
+      );
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return Response.json(
+        { message: "User does not exist" },
+        { status: 404 }
+      );
+    }
+
+    const registrations = await Registration.find({ userId })
+      .populate({
+        path: "eventId",
+        select: "title description type teamSize eventCategory departmentId",
+      })
+      .sort({ createdAt: -1 });
+
+    return Response.json(
+      {
+        count: registrations.length,
+        registrations,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Fetch Registrations Error:", error);
     return Response.json(
       { message: "Internal Server Error" },
       { status: 500 }
