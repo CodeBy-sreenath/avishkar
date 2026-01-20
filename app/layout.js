@@ -41,7 +41,7 @@ export default function RootLayout({ children }) {
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Preload />
-          <div className=" bg-amber-600">
+          <div>
             {/* Menu overlay (unchanged) */}
             <div className="h-[100dvh] fixed inset-0 z-20 pointer-events-none">
               <StaggeredMenu
