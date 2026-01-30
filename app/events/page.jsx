@@ -84,7 +84,7 @@ export default function EventsPage() {
 
       <div className="w-full md:w-1/2 min-h-[50dvh] md:min-h-[100dvh] flex items-end justify-center">
         <div className="w-full px-6 md:px-10 pb-12 md:pb-16 text-center space-y-4">
-          <Link href="/events/dept" className="group mx-auto w-fit block">
+          <Link href="/events/department" className="group mx-auto w-fit block">
             <div className="relative w-[220px] md:w-[260px] aspect-[3/4]">
               <Image
                 src="/events/card2.png"
@@ -97,7 +97,7 @@ export default function EventsPage() {
           </Link>
           <h2 className="deadpool-heading text-4xl md:text-5xl">Department Events</h2>
           <div className="pt-1">
-            <Link href="/events/dept">
+            <Link href="/events/department">
               <span className="inline-block px-8 md:px-10 py-2.5 md:py-3 rounded-full border border-white/30 font-medium text-sm md:text-base transition-all duration-300 hover:border-red-500 hover:text-red-400 hover:shadow-[0_0_30px_rgba(220,38,38,0.75)] active:scale-95">
                 Explore →
               </span>
