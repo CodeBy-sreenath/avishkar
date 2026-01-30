@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const departments = [
   { name: 'Computer Science', slug: 'cse' },
-  { name: 'Mechanical', slug: 'mech' },
+  { name: 'Mechanical', slug: 'mechanical' },
   { name: 'Civil', slug: 'civil' },
   { name: 'Electronics', slug: 'ece' },
   { name: 'Electrical', slug: 'eee' },
