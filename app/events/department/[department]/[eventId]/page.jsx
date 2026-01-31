@@ -27,7 +27,7 @@ const EventRegisterPage = () => {
     semester: '',
     school: '',
     schoolClass: '',
-    teamMembers: [''], 
+    teamMembers: [''],
     paymentScreenshot: null,
     paymentScreenshotBase64: null,
   })
@@ -139,12 +139,13 @@ const EventRegisterPage = () => {
 
       // 🔥 FIX: AUTHENTICATED FETCH
       const token = await auth.getToken()
+      console.log('TOKEN', token)
 
       const res = await fetch('/api/events/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // FIXED
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       })
@@ -314,8 +315,8 @@ const EventRegisterPage = () => {
               form.participantType === 'college'
                 ? 'College Name'
                 : form.participantType === 'school'
-                ? 'School Name'
-                : 'College / School Name'
+                  ? 'School Name'
+                  : 'College / School Name'
             }
             value={form.participantType === 'college' ? form.college : form.school}
             onChange={v =>
@@ -447,10 +448,9 @@ const EventRegisterPage = () => {
               w-full mt-4 py-2.5 rounded-full
               border border-white/30
               transition-all
-              ${
-                form.paymentScreenshot && !submitting
-                  ? 'hover:border-red-500 hover:text-red-400 hover:shadow-[0_0_25px_rgba(220,38,38,0.75)]'
-                  : 'opacity-40 cursor-not-allowed'
+              ${form.paymentScreenshot && !submitting
+                ? 'hover:border-red-500 hover:text-red-400 hover:shadow-[0_0_25px_rgba(220,38,38,0.75)]'
+                : 'opacity-40 cursor-not-allowed'
               }
             `}
           >

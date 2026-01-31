@@ -165,7 +165,7 @@ const Page = () => {
               height={400}
             />
             <h3 className={`${pressStart2P.className} text-xl drop-shadow-[2px_2px_0px_#000] drop-shadow-[#f87f85] text-center`}>FEB 5,6,7 <br />2026</h3>
-            <Link href={`/events`} className={` p-3 mt-2 border pointer-events-auto border-red-600 !text-white drop-shadow-[2px_2px_0px_#000] drop-shadow-[#f87f85] hover:bg-neutral-900 ${pressStart2P.className}`} >Register Now</Link>
+            <Link href={`/events`} className={` p-3 mt-2 border pointer-events-auto border-red-600 !text-white drop-shadow-[2px_2px_0px_#000] drop-shadow-[#f87f85] backdrop-blur-sm hover:bg-neutral-900 ${pressStart2P.className}`} >Register Now</Link>
           </div>
         </div>
         <ScrollMorphComponent />
