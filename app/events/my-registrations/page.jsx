@@ -35,6 +35,7 @@ export default function MyRegistrationsPage() {
         })
 
         const data = await res.json()
+        console.log('DATA', data)
 
         if (!res.ok) {
           throw new Error(data.message || "Failed to fetch registrations")
@@ -179,6 +180,14 @@ export default function MyRegistrationsPage() {
                   </span>
                   <span className="text-white/40">|</span>
                   <span className="text-white/70 capitalize">{event.eventCategory}</span>
+                  {
+                    event.department && (
+                      <>
+                        <span className="text-white/40">|</span>
+                        <span className="text-white/70 capitalize">{event.department}</span>
+                      </>
+                    )
+                  }
                 </div>
 
                 {/* RULES */}
@@ -212,8 +221,8 @@ export default function MyRegistrationsPage() {
                 </div>
 
                 {/* VIEW EVENT BUTTON */}
-                <button
-                  onClick={() => router.push(`/events/${event._id}`)}
+                {/* <button
+                  onClick={() => router.push(`/events/department/${event.department}/${event._id}`)}
                   className="
                     w-full mt-3 py-2 rounded-lg border border-white/30
                     hover:border-red-500 hover:text-red-400
@@ -221,7 +230,7 @@ export default function MyRegistrationsPage() {
                   "
                 >
                   View Event
-                </button>
+                </button> */}
               </div>
             )
           })}

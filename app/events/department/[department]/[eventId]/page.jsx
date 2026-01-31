@@ -112,14 +112,11 @@ const EventRegisterPage = () => {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-
     try {
       const filteredTeamMembers = form.teamMembers.filter(m => m.trim() !== '')
-
       if (event.type === 'team' && filteredTeamMembers.length !== event.teamSize) {
         throw new Error(`Team must have exactly ${event.teamSize} members`)
       }
-
       const payload = {
         eventId: event._id,
         name: form.name,
@@ -136,11 +133,8 @@ const EventRegisterPage = () => {
         teamMembers: event.type === 'team' ? filteredTeamMembers : [],
         paymentScreenshot: form.paymentScreenshotBase64,
       }
-
       // 🔥 FIX: AUTHENTICATED FETCH
       const token = await auth.getToken()
-      console.log('TOKEN', token)
-
       const res = await fetch('/api/events/register', {
         method: 'POST',
         headers: {
@@ -149,18 +143,20 @@ const EventRegisterPage = () => {
         },
         body: JSON.stringify(payload),
       })
-
       const data = await res.json()
-
       if (!res.ok) {
+        // Check if already registered (409 conflict)
+        if (res.status === 409) {
+          alert('Already Registered!\n\nYou have already registered for this event. Check "My Registrations" to view your entry code.')
+          router.push('/events/my-registrations')
+          return
+        }
         throw new Error(data.message || 'Registration failed')
       }
-
       setSuccessCode(data.registration.uniqueCode)
-
       setTimeout(() => {
         router.push('/events/my-registrations')
-      }, 3000)
+      }, 4000)
     } catch (err) {
       console.error('Registration error:', err)
       setError(err.message)
