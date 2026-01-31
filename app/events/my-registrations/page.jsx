@@ -56,7 +56,7 @@ export default function MyRegistrationsPage() {
   // Auth Loading State
   if (!isLoaded || !isSignedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
           <p>Checking authentication...</p>
@@ -68,7 +68,7 @@ export default function MyRegistrationsPage() {
   // Loading UI
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
           <p>Loading your registrations...</p>
@@ -80,7 +80,7 @@ export default function MyRegistrationsPage() {
   // Error UI
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
         <div className="text-center max-w-sm p-6 bg-black/40 border border-red-500/40 rounded-xl backdrop-blur-md">
           <p className="text-red-500 text-xl mb-3">Error</p>
           <p className="text-white/70 mb-4">{error}</p>
@@ -98,7 +98,7 @@ export default function MyRegistrationsPage() {
   // Empty State
   if (registrations.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
         <div className="text-center space-y-4">
           <h2 className="deadpool-heading text-3xl">No Registrations Found</h2>
           <p className="text-white/70">You haven't registered for any events yet.</p>
