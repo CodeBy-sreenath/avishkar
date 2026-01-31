@@ -38,8 +38,8 @@ const EventRegisterPage = () => {
       try {
         const res = await fetch(`/api/events/${eventId}`)
         const data = await res.json()
-        console.log('per event ', data)
 
+        console.log('EVENT DATA', data)
         if (!res.ok) {
           throw new Error(data.message || 'Failed to fetch event')
         }
@@ -133,7 +133,7 @@ const EventRegisterPage = () => {
         teamMembers: event.type === 'team' ? filteredTeamMembers : [],
         paymentScreenshot: form.paymentScreenshotBase64,
       }
-      // 🔥 FIX: AUTHENTICATED FETCH
+
       const token = await auth.getToken()
       const res = await fetch('/api/events/register', {
         method: 'POST',
@@ -145,7 +145,6 @@ const EventRegisterPage = () => {
       })
       const data = await res.json()
       if (!res.ok) {
-        // Check if already registered (409 conflict)
         if (res.status === 409) {
           alert('Already Registered!\n\nYou have already registered for this event. Check "My Registrations" to view your entry code.')
           router.push('/events/my-registrations')
@@ -239,6 +238,7 @@ const EventRegisterPage = () => {
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden">
+      {/* Fixed Background */}
       <div
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url('/events/comic-bg2.png')" }}
@@ -250,14 +250,53 @@ const EventRegisterPage = () => {
           onSubmit={handleSubmit}
           className="w-full max-w-lg bg-black/40 backdrop-blur-md p-8 rounded-2xl border border-white/20 space-y-5"
         >
+          {/* EVENT META */}
           <div className="text-center space-y-2">
-            <h1 className="deadpool-heading text-3xl">{event.title}</h1>
-            <p className="text-sm text-white/80">{event.description}</p>
+            <h1 className="deadpool-heading text-3xl">
+              {event.title}
+            </h1>
+            <p className="text-sm text-white/80">
+              {event.description}
+            </p>
             <div className="flex items-center justify-center gap-4 text-sm mt-2">
               <span className="text-white/60">
                 {event.type === 'team' ? `Team of ${event.teamSize}` : 'Individual'}
               </span>
               <span className="text-red-400 font-semibold">₹{event.amount}</span>
+            </div>
+
+            {/* Event Timing Details */}
+            <div className="mt-4 p-3 rounded-lg bg-black/50 border border-white/20 text-left space-y-1.5">
+              <div className="text-sm">
+                <span className="text-white/60">Start: </span>
+                <span className="text-white/90">
+                  {new Date(event.startTime).toLocaleDateString('en-IN', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                  })} at {new Date(event.startTime).toLocaleTimeString('en-IN', {
+                    hour: '2-digit', minute: '2-digit'
+                  })}
+                </span>
+              </div>
+              <div className="text-sm">
+                <span className="text-white/60">End: </span>
+                <span className="text-white/90">
+                  {new Date(event.endTime).toLocaleDateString('en-IN', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                  })} at {new Date(event.endTime).toLocaleTimeString('en-IN', {
+                    hour: '2-digit', minute: '2-digit'
+                  })}
+                </span>
+              </div>
+              <div className="text-sm">
+                <span className="text-white/60">Registration Deadline: </span>
+                <span className="text-red-400 font-semibold">
+                  {new Date(event.registrationDeadline).toLocaleDateString('en-IN', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                  })} at {new Date(event.registrationDeadline).toLocaleTimeString('en-IN', {
+                    hour: '2-digit', minute: '2-digit'
+                  })}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -276,11 +315,13 @@ const EventRegisterPage = () => {
             </div>
           )}
 
+          {/* FORM */}
           <Field label="Full Name" value={form.name} onChange={v => handleChange('name', v)} />
           <Field label="Age" type="number" value={form.age} onChange={v => handleChange('age', v)} />
           <Field label="Email" type="email" value={form.email} onChange={v => handleChange('email', v)} />
           <Field label="Phone" value={form.phone} onChange={v => handleChange('phone', v)} />
 
+          {/* Participant Type FIRST */}
           <div className="space-y-1">
             <label className="block text-base font-semibold tracking-wide text-white/90 drop-shadow">
               Participant Type
@@ -298,7 +339,7 @@ const EventRegisterPage = () => {
                 focus:border-red-500
                 focus:ring-2 focus:ring-red-500/40
               "
-              onChange={e => handleChange('participantType', e.target.value)}
+              onChange={(e) => handleChange('participantType', e.target.value)}
             >
               <option value="">Select</option>
               <option value="college">College</option>
@@ -323,6 +364,7 @@ const EventRegisterPage = () => {
             }
           />
 
+          {/* Department only for College */}
           {form.participantType === 'college' && (
             <Field
               label="Department"
@@ -351,6 +393,7 @@ const EventRegisterPage = () => {
             </div>
           )}
 
+          {/* Team */}
           {event.type === 'team' && (
             <div className="space-y-2">
               <label className="block text-base font-semibold tracking-wide text-white/90 drop-shadow">
@@ -397,6 +440,7 @@ const EventRegisterPage = () => {
             </div>
           )}
 
+          {/* PAYMENT BLOCK */}
           <div className="p-4 rounded-xl border border-red-500/40 bg-black/50">
             <p className="text-sm text-white/80">Pay using UPI</p>
             <p className="text-lg text-red-400 font-mono">{event.upiId}</p>
@@ -404,6 +448,7 @@ const EventRegisterPage = () => {
             <p className="text-xs text-white/60">Event Registration Fee</p>
           </div>
 
+          {/* Screenshot Upload */}
           <div className="space-y-2">
             <label className="block text-base font-semibold tracking-wide text-white/90 drop-shadow">
               Upload Payment Screenshot *
