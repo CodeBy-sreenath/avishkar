@@ -442,7 +442,7 @@ const EventRegisterPage = () => {
 
           {/* PAYMENT BLOCK */}
           <div className="p-4 rounded-xl border border-red-500/40 bg-black/50">
-            <p className="text-sm text-white/80">Pay using UPI</p>
+            <p className="text-sm text-white/80">GPay Number</p>
             <p className="text-lg text-red-400 font-mono">{event.upiId}</p>
             <p className="text-sm">Amount: ₹{event.amount}</p>
             <p className="text-xs text-white/60">Event Registration Fee</p>
